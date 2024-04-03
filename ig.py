@@ -8,21 +8,27 @@ from tqdm import tqdm
 
 from LSTMModel import LSTMModel
 
+if torch.cuda.is_available():
+    print("CUDA is available! PyTorch is using GPU acceleration.")
+    device = "cuda:1"
+else:
+    print("CUDA is not available. PyTorch is using CPU.")
+    device = "cpu"
 
 columns_to_look = ['EEG.Fp1',	'EEG.AF3',	'EEG.F3',	'EEG.FC1'	,'EEG.C3'	,'EEG.FC3'	,'EEG.T7'	,'EEG.CP5',	'EEG.CP1'	,'EEG.P1'	,'EEG.P7'	,'EEG.P9',	'EEG.PO3'	,'EEG.O1'	,'EEG.O9',	'EEG.POz',	'EEG.Oz',	'EEG.O10',	'EEG.O2',	'EEG.PO4'	,'EEG.P10',	'EEG.P8',	'EEG.P2','EEG.CP2',	'EEG.CP6'	,'EEG.T8',	'EEG.FC4',	'EEG.C4',	'EEG.FC2',	'EEG.F4', 'EEG.AF4',	'EEG.Fp2']
 
 input_size = 32  # Number of features (channels)
 hidden_size = 128  # Number of LSTM units
-num_layers = 1  # Number of LSTM layers
+num_layers = 8 # Number of LSTM layers
 num_classes = 10  # Number of unique labels
-batch_size = 32
+batch_size = 1
 learning_rate = 0.0001
-num_epochs = 20
+num_epochs = 30
 
-model = LSTMModel(input_size, hidden_size, num_layers, num_classes).to("cpu")
+model = LSTMModel(input_size, hidden_size, num_layers, num_classes, device=device).to(device)
 # Load the trained model
 model.load_state_dict(torch.load('lstm_model.pth'))
-model.eval()
+model.train()
 
 with open("data/forLSTM/X.pck", 'rb') as f:
     X = pickle.load(f)
@@ -36,15 +42,14 @@ for label in tqdm(np.unique(Y), total=10):
     Y_filtered = Y[indices]
     X_filtered = X[indices, :, :]
 
-    X_filtered = torch.tensor(X_filtered, dtype=torch.float32).to("cpu")
-    Y_filtered = torch.tensor(Y_filtered, dtype=torch.long).to("cpu")
+    X_filtered = torch.tensor(X_filtered, dtype=torch.float32).to(device)
+    Y_filtered = torch.tensor(Y_filtered, dtype=torch.long).to(device)
     train_loader = torch.utils.data.DataLoader(torch.utils.data.TensorDataset(X_filtered, Y_filtered),
-                                               batch_size=1,
+                                               batch_size=batch_size,
                                                shuffle=True)
 
 
-
-    for i, (inputs, labels) in tqdm(enumerate(train_loader), total=len(train_loader)):
+    for i, (inputs, labels) in tqdm(enumerate(train_loader), total=len(train_loader),position=0, leave=False):
         integrated_gradients = IntegratedGradients(model)
         attributions, _ = integrated_gradients.attribute(inputs, target=labels, return_convergence_delta=True)
         attributions = attributions.squeeze().cpu().numpy()

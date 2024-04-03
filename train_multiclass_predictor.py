@@ -6,13 +6,15 @@ import torch.optim as optim
 from sklearn.metrics import f1_score
 import torch.nn.functional as F
 from sklearn.model_selection import train_test_split
+from torch.optim import lr_scheduler
+
 import wandb
 
 from LSTMModel import LSTMModel
 
 if torch.cuda.is_available():
     print("CUDA is available! PyTorch is using GPU acceleration.")
-    device = "cuda:0"
+    device = "cuda:1"
 else:
     print("CUDA is not available. PyTorch is using CPU.")
     device = "cpu"
@@ -29,12 +31,12 @@ print(np.shape(X), np.shape(Y))
 
 # Define hyperparameters
 input_size = 32  # Number of features (channels)
-hidden_size = 64  # Number of LSTM units
-num_layers = 64 # Number of LSTM layers
+hidden_size = 128  # Number of LSTM units
+num_layers = 8 # Number of LSTM layers
 num_classes = 10  # Number of unique labels
-batch_size = 32
+batch_size = 128
 learning_rate = 0.0001
-num_epochs = 20
+num_epochs = 30
 
 # Create LSTM model
 model = LSTMModel(input_size, hidden_size, num_layers, num_classes, device).to(device)
@@ -42,6 +44,7 @@ model = LSTMModel(input_size, hidden_size, num_layers, num_classes, device).to(d
 # Loss function and optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=3, factor=0.01, verbose=True)
 
 X_train, X_val, y_train, y_val = train_test_split(X, Y, test_size=0.3)
 X_train_tensor = torch.tensor(X_train, dtype=torch.float32).to(device)
@@ -105,6 +108,7 @@ for epoch in range(num_epochs):
 
         f1 = f1_score(all_labels, all_preds, average='weighted')
         print(f'Epoch [{epoch + 1}/{num_epochs}], Validation F1 Score: {f1:.4f}')
+        scheduler.step(np.mean(val_losses))
     wandb.log({"Valid/F1": f1, "Train/Loss": np.mean(train_losses), "Valid/Loss": np.mean(val_losses)})
 wandb.finish()
 torch.save(model.state_dict(), 'lstm_model.pth')
