@@ -1,0 +1,131 @@
+EEG.Fp1: Frontopolar region, left side of the forehead.
+It's associated with executive functions and decision-making processes.
+
+EEG.AF3: Anterior Frontal region, left side.
+It's involved in cognitive control, attention, and working memory.
+
+EEG.F3: Frontal region, left side.
+It's associated with motor planning, attention, and executive functions.
+
+EEG.FC1: Frontocentral region, left side.
+It's involved in motor control, attention, and language processing.
+EEG.C3: Central region, left side.
+It's associated with motor control, sensory processing, and somatosensory functions.
+
+EEG.FC3: Frontocentral region, left side.
+It's involved in motor planning, attention, and working memory.
+
+EEG.T7: Temporal region, left side.
+It's associated with auditory processing, language comprehension, and memory.
+
+EEG.CP5: Centroparietal region, left side.
+It's involved in sensory integration, spatial processing, and attention.
+
+EEG.CP1: Centroparietal region, left side.
+It's associated with sensory integration, spatial processing, and attention.
+
+EEG.P1: Parietal region, left side.
+It's involved in visual processing, spatial attention, and perception.
+
+EEG.P7: Parietal region, left side.
+It's associated with visual processing, spatial attention, and perception.
+
+EEG.P9: Parietal region, left side.
+It's involved in visual processing, spatial attention, and perception.
+
+EEG.PO3: Parieto-Occipital region, left side.
+It's associated with visual processing, spatial attention, and perception.
+
+EEG.O1: Occipital region, left side.
+It's involved in visual processing, object recognition, and spatial awareness.
+
+EEG.O9: Occipital region, left side.
+It's associated with visual processing, object recognition, and spatial awareness.
+
+EEG.POz: Parieto-Occipital region, midline.
+It's involved in visual processing, spatial attention, and perception.
+
+EEG.Oz: Occipital region, midline.
+It's associated with visual processing, object recognition, and spatial awareness.
+
+EEG.O10: Occipital region, right side.
+It's involved in visual processing, object recognition, and spatial awareness.
+
+EEG.O2: Occipital region, right side.
+It's associated with visual processing, object recognition, and spatial awareness.
+
+EEG.PO4: Parieto-Occipital region, right side.
+It's involved in visual processing, spatial attention, and perception.
+
+EEG.P10: Parietal region, right side.
+It's associated with visual processing, spatial attention, and perception.
+
+EEG.P8: Parietal region, right side.
+It's involved in visual processing, spatial attention, and perception.
+
+EEG.P2: Parietal region, right side.
+It's associated with visual processing, spatial attention, and perception.
+
+EEG.CP2: Centroparietal region, right side.
+It's involved in sensory integration, spatial processing, and attention.
+
+EEG.CP6: Centroparietal region, right side.
+It's associated with sensory integration, spatial processing, and attention.
+
+EEG.T8: Temporal region, right side.
+It's involved in auditory processing, language comprehension, and memory.
+
+EEG.FC4: Frontocentral region, right side.
+It's associated with motor planning, attention, and working memory.
+
+EEG.C4: Central region, right side.
+It's involved in motor control, sensory processing, and somatosensory functions.
+
+EEG.FC2: Frontocentral region, right side.
+It's associated with motor planning, attention, and working memory.
+
+EEG.F4: Frontal region, right side.
+It's involved in motor planning, attention, and executive functions.
+
+EEG.AF4: Anterior Frontal region, right side.
+It's associated with cognitive control, attention, and working memory.
+
+EEG.Fp2: Frontopolar region, right side of the forehead.
+It's involved in executive functions and decision-making processes.
+
+
+EEG.Fp1 and EEG.Fp2 (Frontopolar regions, left and right sides):
+These channels are associated with executive functions related to visual attention,
+decision-making, and cognitive control during visual observation tasks.
+
+EEG.AF3 and EEG.AF4 (Anterior Frontal regions, left and right sides):
+These channels are involved in cognitive processes such as attention allocation,
+anticipation, and emotional regulation during visual tasks.
+
+EEG.F3 and EEG.F4 (Frontal regions, left and right sides):
+These channels play a role in motor planning, attentional control, and higher-order visual
+processing, including object recognition and categorization.
+
+EEG.FC1, EEG.FC2, EEG.FC3, and EEG.FC4
+(Frontocentral regions, left and right sides): These channels are associated with working memory,
+attentional shifts, and visuospatial processing during visual observation tasks.
+
+EEG.C3 and EEG.C4 (Central regions, left and right sides):
+These channels are involved in sensorimotor integration, action planning, and spatial
+cognition during visual perception and motor response tasks.
+
+EEG.T7 and EEG.T8 (Temporal regions, left and right sides):
+These channels contribute to auditory and visual integration processes,
+such as multisensory integration, language comprehension, and memory encoding during visual observation.
+
+EEG.CP1, EEG.CP2, EEG.CP5, and EEG.CP6 (Centroparietal regions, left and right sides):
+These channels play a role in visuospatial attention, object localization, and spatial
+memory during visual perception and attention tasks.
+
+EEG.P1, EEG.P2, EEG.P7, EEG.P8, EEG.P9, EEG.P10, EEG.PO3, EEG.PO4, EEG.POz
+(Parietal and Parieto-Occipital regions): These channels are involved in visual processing,
+including object recognition, feature extraction, spatial attention, and visual memory.
+
+EEG.O1, EEG.O2, EEG.O9, EEG.O10 (Occipital regions):
+These channels are primarily associated with visual processing, such as encoding visual
+stimuli, analyzing shapes, colors, and motion, and forming visual representations of the environment.
