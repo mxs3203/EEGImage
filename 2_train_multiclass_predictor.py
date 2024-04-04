@@ -9,7 +9,6 @@ from sklearn.model_selection import train_test_split
 from torch.optim import lr_scheduler
 
 import wandb
-
 from LSTMModel import LSTMModel
 
 if torch.cuda.is_available():
