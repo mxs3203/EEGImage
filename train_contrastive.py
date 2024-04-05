@@ -32,14 +32,14 @@ print(np.shape(X), np.shape(Y))
 input_size = 32  # Number of features (channels)
 hidden_size = 128  # Number of LSTM units
 num_layers = 4 # Number of LSTM layers
-batch_size = 1024
+batch_size = 2048
 learning_rate = 0.0001
 num_epochs = 200
-temp = 0.07
+temp = 0.01
 base_temperature = 0.08
 output_size = 256
 # Create the LSTM autoencoder model
-model = LSTMModel(input_size, hidden_size, num_layers, output_size, device=device).to(device)
+model = LSTMModel(input_size, hidden_size, num_layers, output_size, device=device, contrastive=True).to(device)
 
 # Define loss function and optimizer
 criterion = SupConLoss(temperature=temp, base_temperature=base_temperature, device=device)
@@ -130,7 +130,7 @@ for epoch in range(num_epochs):
             run.log({"UMAP": plt})
 
     run.log({"Train/Loss": np.mean(train_losses), "Valid/Loss": np.mean(val_losses)})
-torch.save(model.state_dict(), 'lstm_contrsative_model.pth')
+torch.save(model.state_dict(), 'lstm_contrsative_model_azure_armadillo.pth')
 run.log_model('lstm_contrsative_model.pth', "Contrastive Model LSTM")
 wandb.finish()
 
