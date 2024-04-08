@@ -1,6 +1,5 @@
 
 import pickle
-import seaborn as sb
 import pandas as pd
 import numpy as np
 import torch
@@ -32,10 +31,10 @@ print(np.shape(X), np.shape(Y))
 input_size = 32  # Number of features (channels)
 hidden_size = 128  # Number of LSTM units
 num_layers = 4 # Number of LSTM layers
-batch_size = 2048
+batch_size = 1024
 learning_rate = 0.0001
 num_epochs = 200
-temp = 0.01
+temp = 0.03
 base_temperature = 0.08
 output_size = 256
 # Create the LSTM autoencoder model
