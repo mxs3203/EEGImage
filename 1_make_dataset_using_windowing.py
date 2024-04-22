@@ -15,7 +15,7 @@ columns_to_look = ['EEG.Fp1',	'EEG.AF3',	'EEG.F3',	'EEG.FC1','EEG.C3','EEG.FC3',
                    'EEG.T8','EEG.FC4','EEG.C4','EEG.FC2','EEG.F4','EEG.AF4','EEG.Fp2']
 
 
-WINDOW_SIZE = 50
+WINDOW_SIZE = 30
 
 
 X_sequences = []

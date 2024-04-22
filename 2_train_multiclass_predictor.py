@@ -31,7 +31,7 @@ print(np.shape(X), np.shape(Y))
 # Define hyperparameters
 input_size = 32  # Number of features (channels)
 hidden_size = 128  # Number of LSTM units
-num_layers = 8 # Number of LSTM layers
+num_layers = 4 # Number of LSTM layers
 num_classes = 10  # Number of unique labels
 batch_size = 128
 learning_rate = 0.0001

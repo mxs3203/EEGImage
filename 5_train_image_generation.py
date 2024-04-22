@@ -1,16 +1,12 @@
 import pickle
-import pandas as pd
 import numpy as np
 import torch
-import umap
 from matplotlib import pyplot as plt
 from torch.utils.data import random_split
 
 import wandb
 from ImageGenerationDataset import ImageGenerationDataset
-from VariationalImageGenerator import ImageGenerator
-from losses import SupConLoss
-from sklearn.model_selection import train_test_split
+from ImageGeneratorModel import ImageGenerator
 from torch import optim
 
 from LSTMModel import LSTMModel
@@ -30,25 +26,26 @@ with open("data/forLSTM/Y.pck", 'rb') as f:
 
 print(np.shape(X), np.shape(Y))
 
-
+FINE_TUNE = True
 input_size = 32  # Number of features (channels)
 hidden_size = 128  # Number of LSTM units
 num_layers = 4 # Number of LSTM layers
-batch_size = 128
-learning_rate = 0.0001
-num_epochs = 100
-output_size = 256
+batch_size = 256
+learning_rate = 0.00001
+num_epochs = 25
+contrastive_output_size = 64
 # Create the LSTM autoencoder model
-model = LSTMModel(input_size, hidden_size, num_layers, output_size, device=device, contrastive=True).to(device)
-model.load_state_dict(torch.load("lstm_contrsative_model_azure_armadillo.pth"))
-model.eval()
-for param in model.parameters():
-    param.requires_grad = False
+model = LSTMModel(input_size, hidden_size, num_layers, contrastive_output_size, device=device, contrastive=True).to(device)
+model.load_state_dict(torch.load("lstm_contrsative_model_64.pth"))
+if not FINE_TUNE:
+    model.eval()
+    for param in model.parameters():
+        param.requires_grad = False
 
 image_generatin_dataset = ImageGenerationDataset(data=X, targets=Y,
                                                  mnist_folder="data/MNIST",
                                                  device=device,
-                                                 number_of_imgs_per_class=100)
+                                                 number_of_imgs_per_class=1000)
 train_size = int(0.7 * len(image_generatin_dataset))  # 80% for training
 test_size = len(image_generatin_dataset) - train_size
 train_dataset, test_dataset = random_split(image_generatin_dataset,
@@ -58,13 +55,16 @@ image_generatin_dataset_train_loader = torch.utils.data.DataLoader(train_dataset
 image_generatin_dataset_valid_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
 
-image_generator = ImageGenerator(device=device, image_channels=1, input_size=256, scale_factor=7).to(device)
+image_generator = ImageGenerator(device=device, image_channels=1, input_size=contrastive_output_size, scale_factor=7).to(device)
 optimizer = optim.Adam(image_generator.parameters(), lr=learning_rate)
-criterion = torch.nn.MSELoss(reduction='mean')
+if FINE_TUNE:
+    optimizer2 = optim.Adam(model.parameters(), lr=learning_rate)
+criterion = torch.nn.MSELoss(reduction='sum')
 
 run = wandb.init(
     # set the wandb project where this run will be logged
     project="EEGImage",
+    name="ImageGenerator-{}".format(contrastive_output_size),
 
     config={
         "learning_rate": learning_rate,
@@ -74,9 +74,8 @@ run = wandb.init(
         "hidden_size": hidden_size,
         "num_layers": num_layers,
         "num_epochs": num_epochs,
-        "output_size": output_size,
-
-
+        "output_size": contrastive_output_size,
+        "fine_tune": FINE_TUNE
     }
 )
 
@@ -86,21 +85,31 @@ total_steps = len(image_generatin_dataset_train_loader)
 for epoch in range(num_epochs):
     train_losses = []
     val_losses = []
+    if FINE_TUNE:
+        model.train()
+    image_generator.train()
     for i, (x,y,images) in enumerate(image_generatin_dataset_train_loader):
         # Forward pass
+        optimizer.zero_grad()
+        if FINE_TUNE:
+            optimizer2.zero_grad()
         extracted_eeg_features = model(x)
         generated_image = image_generator(extracted_eeg_features)
         loss = criterion(generated_image, images)
         train_losses.append(loss.item())
         # Backward and optimize
-        optimizer.zero_grad()
+
         loss.backward()
         optimizer.step()
+        if FINE_TUNE:
+            optimizer2.step()
         if (i + 1) % 100 == 0:
            print(f'Epoch [{epoch + 1}/{num_epochs}], Step [{i + 1}/{total_steps}], Loss: {loss.item():.4f}')
 
     # Validation
-    model.eval()
+    if FINE_TUNE:
+        model.eval()
+    image_generator.eval()
     with torch.no_grad():
         all_preds = []
         for i, (x,y,images) in enumerate(image_generatin_dataset_valid_loader):
@@ -121,7 +130,7 @@ for epoch in range(num_epochs):
 
     run.log({"Train/Loss": np.mean(train_losses), "Valid/Loss": np.mean(val_losses)})
 torch.save(model.state_dict(), 'image_generation_model.pth')
-# run.log_model('image_generation_model.pth', "Contrastive Model LSTM")
+run.log_model('image_generation_model.pth', "ImageGenerationModel")
 wandb.finish()
 
 print('Training finished.')
