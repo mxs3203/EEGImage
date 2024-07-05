@@ -38,7 +38,7 @@ learning_rate = 0.0001
 num_epochs = 30
 
 # Create LSTM model
-model = LSTMModel(input_size, hidden_size, num_layers, num_classes, device).to(device)
+model = LSTMModel(input_size, hidden_size, num_layers, num_classes, device, contrastive=False).to(device)
 
 # Loss function and optimizer
 criterion = nn.CrossEntropyLoss()
@@ -61,6 +61,7 @@ val_loader = torch.utils.data.DataLoader(val_data, batch_size=batch_size, shuffl
 wandb.init(
     # set the wandb project where this run will be logged
     project="EEGImage",
+    name="PredictNumber-Visual-LSTM",
 
     config={
         "learning_rate": learning_rate,

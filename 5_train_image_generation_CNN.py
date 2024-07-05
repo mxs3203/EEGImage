@@ -9,7 +9,7 @@ from Discriminator import Discriminator
 from ImageGenerationDataset import ImageGenerationDataset
 from ImageGeneratorModel import ImageGenerator
 from torch import optim
-
+from skimage.metrics import structural_similarity as ssim
 from LSTMModel import LSTMModel
 
 if torch.cuda.is_available():
@@ -27,7 +27,7 @@ with open("data/forLSTM/Y.pck", 'rb') as f:
 
 print(np.shape(X), np.shape(Y))
 
-FINE_TUNE = False
+FINE_TUNE = True
 GAN = False
 input_size = 32  # Number of features (channels)
 hidden_size = 128  # Number of LSTM units
@@ -64,8 +64,8 @@ criterion = torch.nn.BCEWithLogitsLoss()
 run = wandb.init(
     # set the wandb project where this run will be logged
     project="EEGImage",
-    name="ImageGenerator-CNN-{}".format(contrastive_output_size),
-
+    name="SSIM-ImageGenerator-CNN-{}-BCE".format(contrastive_output_size),
+    entity='mxs3203',
     config={
         "learning_rate": learning_rate,
         "architecture": "LSTM_Contrastive_ImageGeneration",
@@ -87,6 +87,7 @@ for epoch in range(num_epochs):
     val_losses = []
     train_losses_D = []
     val_losses_D = []
+    ssims_train = []
     if FINE_TUNE:
         model.train()
     image_generator.train()
@@ -97,6 +98,10 @@ for epoch in range(num_epochs):
 
         extracted_eeg_features = model(x)
         generated_image = image_generator(extracted_eeg_features)
+        for j in range(len(y)):
+            gen_img, real_img = generated_image[j,:, :, :].detach().cpu().numpy(),images[j,:, :, :].detach().cpu().numpy()
+            ssim_const = ssim(gen_img.squeeze(), real_img.squeeze(), data_range=1)
+            ssims_train.append(ssim_const)
         loss = criterion(generated_image, images)
         train_losses.append(loss.item())
         # Backward and optimize
@@ -115,9 +120,14 @@ for epoch in range(num_epochs):
     image_generator.eval()
     with torch.no_grad():
         all_preds = []
+        ssims_val = []
         for i, (x,y,images) in enumerate(image_generatin_dataset_valid_loader):
             extracted_eeg_features = model(x)
             generated_image = image_generator(extracted_eeg_features)
+            for j in range(len(y)):
+                gen_img, real_img = generated_image[j, :, :, :].detach().cpu().numpy(), images[j, :, :, :].detach().cpu().numpy()
+                ssim_const = ssim(gen_img.squeeze(), real_img.squeeze(), data_range=1)
+                ssims_val.append(ssim_const)
             loss = criterion(generated_image, images)
             val_losses.append(loss.item())
 
@@ -132,7 +142,7 @@ for epoch in range(num_epochs):
                 axes[row, col].axis('off')
             run.log({"GenerateImage": fig})
 
-    run.log({"Train/Loss": np.mean(train_losses), "Valid/Loss": np.mean(val_losses)})
+    run.log({"Train/Loss": np.mean(train_losses), "Valid/Loss": np.mean(val_losses), 'Train/SSIM':np.mean(ssims_train), 'Valid/SSIM': np.mean(ssims_val)})
 torch.save(model.state_dict(), 'image_generation_model_CNN.pth')
 run.log_model('image_generation_model.pth', "ImageGenerationModel")
 wandb.finish()

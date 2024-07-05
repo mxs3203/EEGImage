@@ -14,6 +14,9 @@ columns_to_look = ['EEG.Fp1',	'EEG.AF3',	'EEG.F3',	'EEG.FC1','EEG.C3','EEG.FC3',
                    'EEG.O10','EEG.O2','EEG.PO4','EEG.P10','EEG.P8','EEG.P2','EEG.CP2','EEG.CP6',
                    'EEG.T8','EEG.FC4','EEG.C4','EEG.FC2','EEG.F4','EEG.AF4','EEG.Fp2']
 
+columns_to_look_no_visual = ['EEG.Fp1',	'EEG.AF3',	'EEG.F3','EEG.FC1','EEG.C3','EEG.FC3','EEG.T7',
+                   'EEG.T8','EEG.FC4','EEG.C4','EEG.FC2','EEG.F4','EEG.AF4','EEG.Fp2']
+
 
 WINDOW_SIZE = 30
 
@@ -22,7 +25,7 @@ X_sequences = []
 y_labels = []
 for file_path in tqdm(glob.glob("data/normalized_by_baseline/channels/*.csv")):
     data = pd.read_csv(file_path)
-    X = data.drop(columns=['label', 'Unnamed: 0', 'exp']).values  # Features (32 channels)
+    X = data[columns_to_look].values  # Features (32 channels)
     y = data['label'].values  # Labels
 
     for i in range(len(X) - WINDOW_SIZE + 1):

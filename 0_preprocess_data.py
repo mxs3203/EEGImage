@@ -4,15 +4,25 @@ from tqdm import tqdm
 
 NUMBER_OF_EXPERIMENTS = 7
 columns_to_look = ['EEG.Fp1',	'EEG.AF3',	'EEG.F3',	'EEG.FC1'	,'EEG.C3'	,'EEG.FC3'	,'EEG.T7'	,'EEG.CP5',	'EEG.CP1'	,'EEG.P1'	,'EEG.P7'	,'EEG.P9',	'EEG.PO3'	,'EEG.O1'	,'EEG.O9',	'EEG.POz',	'EEG.Oz',	'EEG.O10',	'EEG.O2',	'EEG.PO4'	,'EEG.P10',	'EEG.P8',	'EEG.P2','EEG.CP2',	'EEG.CP6'	,'EEG.T8',	'EEG.FC4',	'EEG.C4',	'EEG.FC2',	'EEG.F4', 'EEG.AF4',	'EEG.Fp2']
-TRIM_FIRST = 50
-TRIM_LAST = 50
+TRIM_FIRST = 1
+TRIM_LAST = 1
 
 all_dfs = []
 for i in range(1, NUMBER_OF_EXPERIMENTS + 1):
     print("Running for Exp",i )
     data = pd.read_csv("data/exp{}/data.csv".format(i), skiprows=1)
     column_names_extra = [col for col in data.columns if col.startswith("POW")]
-
+    timestamps = data['Timestamp'].values
+    differences = [timestamps[i + 1] - timestamps[i] for i in range(len(timestamps) - 1)]
+    average_difference_ms = sum(differences) / len(differences) * 1000  # Convert to milliseconds
+    print("Average difference in milliseconds:", average_difference_ms)
+    start_timestamp = timestamps[1]
+    end_timestamp = timestamps[31]
+    time_period_ms = (end_timestamp - start_timestamp) * 1000  # Convert to milliseconds
+    print("Time period covered by the subset in milliseconds:", time_period_ms)
+    average_difference_sec = average_difference_ms / 1000
+    frequency_hz = 1 / average_difference_sec
+    print("Frequency in Hertz (Hz):", frequency_hz)
     markers = pd.read_csv("data/exp{}/intervalMarker.csv".format(i))
     markers = markers[['type','duration','marker_id']]
     # find how is the marker called for open/closed eyes
